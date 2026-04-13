@@ -2,14 +2,14 @@
 
 ## 在线访问网址
 
-- 待 M7 完成首次部署后补充最终公网地址。
+- 最终公网地址：`https://campus-secend-trading-system.onrender.com`
 
 ## 当前部署方案
 
 - 推荐平台：Render
 - 推荐形式：`Web Service + Persistent Disk`
 - 当前仓库已补齐：`requirements.txt`、`wsgi.py`、`render.yaml`
-- 当前手动环节：需要在 Render 控制台登录账号、授权 GitHub 仓库并创建服务
+- 当前状态：已完成首次部署，并获得稳定 HTTPS 访问地址
 
 ## 为什么当前选择 Render
 
@@ -56,10 +56,10 @@
 
 部署完成后，应至少验证以下地址：
 
-- `/`
-- `/items`
-- `/users`
-- `/orders`
+- `https://campus-secend-trading-system.onrender.com/`
+- `https://campus-secend-trading-system.onrender.com/items`
+- `https://campus-secend-trading-system.onrender.com/users`
+- `https://campus-secend-trading-system.onrender.com/orders`
 
 并确认以下行为：
 
@@ -67,6 +67,14 @@
 - 商品、用户、订单页面都能显示数据库中的真实数据
 - 商品新增、改价、删除、购买功能可正常使用
 - 查询面板能够返回结果
+
+## 当前线上验证结果（2026-04-13）
+
+- 已验证首页可正常打开，并显示商品总数 5、用户总数 4、订单总数 2。
+- 已验证商品页、用户页、订单页均可在线访问，且页面数据来自真实数据库。
+- 已验证商品页基础查询 `未售商品查询结果` 可以在线返回 3 条记录。
+- 已验证用户页聚合查询 `商品总数统计` 可以在线返回结果 `5`。
+- 已验证订单页连接查询 `已售商品及买家姓名` 可以在线返回 2 条记录。
 
 ## 重要说明
 

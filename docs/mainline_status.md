@@ -4,8 +4,8 @@
 **对应计划：** `docs/mainline_plan.md`  
 **建立日期：** 2026-04-13  
 **最近更新：** 2026-04-13  
-**当前阶段：** M7 进行中  
-**总进度：** 6 / 8 任务完成
+**当前阶段：** M7 已完成  
+**总进度：** 7 / 8 任务完成
 
 ## 状态维护规则
 
@@ -25,13 +25,12 @@
 | M4 | 数据操作功能 | 已完成 | 新增商品、修改价格、删除未售商品可用 | 已完成商品表单操作并通过真实落库验证 |
 | M5 | 基础查询、连接查询与聚合展示 | 已完成 | 所有题目要求查询可在页面展示 | 已完成基础查询、连接查询与聚合结果面板 |
 | M6 | 购买商品业务逻辑与一致性保护 | 已完成 | 购买流程事务化，重复购买被阻止 | 已完成购买事务、订单生成与重复购买保护 |
-| M7 | 部署与在线访问地址 | 进行中 | 获得可访问公网网址并完成线上验证 | 已补齐 Render 部署入口并完成本地 Gunicorn 验证，等待平台侧创建服务并获取公网地址 |
+| M7 | 部署与在线访问地址 | 已完成 | 获得可访问公网网址并完成线上验证 | 已部署到 Render，公网地址为 `https://campus-secend-trading-system.onrender.com`，4 个页面线上验证通过 |
 | M8 | 提交材料、说明文档与演示准备 | 未开始 | 文档、截图、简答、视频脚本齐备 | 待执行 |
 
 ## 当前阻塞
 
-- M7 仍需在部署平台侧完成账号登录、仓库授权与服务创建；若选择 Render 且要保留 SQLite 数据，需要使用支持 Persistent Disk 的付费 Web Service。
-- 在拿到最终公网地址前，暂时无法完成线上页面验收与状态收尾。
+- 暂无。
 
 ## 更新日志
 
@@ -50,6 +49,7 @@
 - 2026-04-13：完成 M6，商品页已支持购买商品事务、自动生成订单编号、重复购买拦截与失败回滚；验证命令 `.venv/bin/python -m unittest tests/test_purchase.py tests/test_queries.py tests/test_item_operations.py tests/test_pages.py tests/test_app.py tests/test_database.py` 全部通过。
 - 2026-04-13：开始执行 M7，已将部署目标确定为 Render，并进入部署入口文件与说明文档补齐阶段；当前待用户在平台侧完成账号登录、仓库授权与服务创建。
 - 2026-04-13：补齐 Render 部署入口，已新增 `render.yaml`、`wsgi.py`、`docs/report.md`，并在 `app.py` 中支持从环境变量读取 `DATABASE_PATH` 与 `SECRET_KEY`；验证命令 `.venv/bin/python -m unittest discover -s tests -p 'test_*.py'` 通过，且使用 `DATABASE_PATH=/tmp/... .venv/bin/gunicorn --bind 127.0.0.1:5080 --workers 1 wsgi:app` 启动后，`/`、`/items`、`/users`、`/orders` 均返回 HTTP 200。
+- 2026-04-13：完成 M7，已获得公网地址 `https://campus-secend-trading-system.onrender.com`；线上验证结果为 `/`、`/items`、`/users`、`/orders` 均可访问，首页显示商品总数 5、用户总数 4、订单总数 2，商品页查询 `unsold` 返回 3 条结果，用户页聚合查询 `item_total` 返回 1 条统计结果，订单页连接查询 `sold_with_buyer` 返回 2 条结果。
 
 ## 使用提醒
 
