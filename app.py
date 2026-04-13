@@ -1,7 +1,16 @@
 import sqlite3
 from pathlib import Path
 
-from flask import Flask, current_app, g, render_template
+from flask import (
+    Flask,
+    current_app,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 DEFAULT_DATABASE_PATH = BASE_DIR / "db" / "campus_trading.sqlite3"
@@ -48,10 +57,18 @@ def fetch_all(query, params=()):
     return get_db().execute(query, params).fetchall()
 
 
+def fetch_one(query, params=()):
+    return get_db().execute(query, params).fetchone()
+
+
 def close_db(_error=None):
     connection = g.pop("db", None)
     if connection is not None:
         connection.close()
+
+
+def parse_price(raw_value):
+    return float(raw_value)
 
 
 def create_app(test_config=None):
@@ -97,7 +114,82 @@ def create_app(test_config=None):
             ORDER BY item_id
             """
         )
-        return render_template("items.html", items=items)
+        users = fetch_all(
+            "SELECT user_id, user_name FROM user ORDER BY user_id"
+        )
+        return render_template("items.html", items=items, users=users)
+
+    @app.post("/items/add")
+    def add_item():
+        connection = get_db()
+
+        try:
+            connection.execute(
+                """
+                INSERT INTO item (item_id, item_name, category, price, status, seller_id)
+                VALUES (?, ?, ?, ?, 0, ?)
+                """,
+                (
+                    request.form["item_id"].strip(),
+                    request.form["item_name"].strip(),
+                    request.form["category"].strip(),
+                    parse_price(request.form["price"]),
+                    request.form["seller_id"].strip(),
+                ),
+            )
+            connection.commit()
+            flash("商品新增成功。", "success")
+        except (KeyError, ValueError):
+            connection.rollback()
+            flash("新增失败：请填写完整且合法的商品信息。", "error")
+        except sqlite3.IntegrityError as error:
+            connection.rollback()
+            flash(f"新增失败：{error}", "error")
+
+        return redirect(url_for("items_page"))
+
+    @app.post("/items/update-price")
+    def update_item_price():
+        connection = get_db()
+
+        try:
+            new_price = parse_price(request.form["price"])
+            cursor = connection.execute(
+                "UPDATE item SET price = ? WHERE item_id = ?",
+                (new_price, request.form["item_id"].strip()),
+            )
+            if cursor.rowcount == 0:
+                flash("改价失败：未找到目标商品。", "error")
+            else:
+                connection.commit()
+                flash("商品价格修改成功。", "success")
+        except (KeyError, ValueError):
+            connection.rollback()
+            flash("改价失败：请输入合法价格。", "error")
+        except sqlite3.IntegrityError as error:
+            connection.rollback()
+            flash(f"改价失败：{error}", "error")
+
+        return redirect(url_for("items_page"))
+
+    @app.post("/items/delete")
+    def delete_item():
+        connection = get_db()
+        item_id = request.form.get("item_id", "").strip()
+        item = fetch_one("SELECT status FROM item WHERE item_id = ?", (item_id,))
+
+        if item is None:
+            flash("删除失败：未找到目标商品。", "error")
+            return redirect(url_for("items_page"))
+
+        if item["status"] == 1:
+            flash("只能删除未售出的商品。", "error")
+            return redirect(url_for("items_page"))
+
+        connection.execute("DELETE FROM item WHERE item_id = ?", (item_id,))
+        connection.commit()
+        flash("未售商品删除成功。", "success")
+        return redirect(url_for("items_page"))
 
     @app.route("/users")
     def users_page():

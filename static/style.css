@@ -127,6 +127,15 @@ h1 {
     margin-top: 18px;
 }
 
+.forms-grid,
+.message-stack {
+    display: grid;
+    gap: 16px;
+    width: min(1100px, 100%);
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .metrics-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -154,6 +163,11 @@ h1 {
 
 .nav-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.forms-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 18px;
 }
 
 .nav-card {
@@ -239,6 +253,74 @@ h1 {
     color: var(--sold-text);
 }
 
+.message-stack {
+    margin-top: 0;
+    margin-bottom: 18px;
+}
+
+.message-banner,
+.form-card {
+    padding: 18px 20px;
+    border-radius: 20px;
+    border: 1px solid var(--panel-border);
+    background: var(--panel-strong);
+    box-shadow: var(--shadow);
+}
+
+.message-banner.success {
+    color: #27603f;
+    background: #edf7ef;
+}
+
+.message-banner.error {
+    color: #9d3f23;
+    background: #fdf0ec;
+}
+
+.form-card h2 {
+    margin: 0 0 14px;
+    font-size: 1.08rem;
+}
+
+.data-form {
+    display: grid;
+    gap: 12px;
+}
+
+.data-form label {
+    display: grid;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+.data-form input,
+.data-form select,
+.data-form button {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--table-border);
+    padding: 12px 14px;
+    font: inherit;
+}
+
+.data-form input,
+.data-form select {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.data-form button {
+    cursor: pointer;
+    border: none;
+    color: #fff;
+    background: var(--accent);
+    font-weight: 700;
+}
+
+.data-form button.danger {
+    background: #8f341f;
+}
+
 @media (max-width: 860px) {
     .site-header,
     .section-head {
@@ -247,7 +329,8 @@ h1 {
     }
 
     .metrics-grid,
-    .nav-grid {
+    .nav-grid,
+    .forms-grid {
         grid-template-columns: 1fr;
     }
 
