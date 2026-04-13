@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: campus-secend-trading-system
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 wsgi:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /var/data/campus_trading.sqlite3
+    disk:
+      name: campus-data
+      mountPath: /var/data
+      sizeGB: 5

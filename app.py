@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from pathlib import Path
 
@@ -91,8 +92,8 @@ def generate_order_id(connection):
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.update(
-        SECRET_KEY="dev",
-        DATABASE_PATH=str(DEFAULT_DATABASE_PATH),
+        SECRET_KEY=os.environ.get("SECRET_KEY", "dev"),
+        DATABASE_PATH=os.environ.get("DATABASE_PATH", str(DEFAULT_DATABASE_PATH)),
         SCHEMA_PATH=str(DEFAULT_SCHEMA_PATH),
         SEED_PATH=str(DEFAULT_SEED_PATH),
         INIT_DATABASE=True,
@@ -299,4 +300,8 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", "5000")),
+        debug=os.environ.get("FLASK_DEBUG", "1") == "1",
+    )
