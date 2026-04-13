@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园二手交易平台数据库系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="hero-card">
+            <p class="eyebrow">Campus Second-Hand Trading</p>
+            <h1>校园二手交易平台数据库系统</h1>
+            <p class="hero-copy">
+                当前阶段已完成最小可运行骨架。后续将逐步接入数据库建模、真实数据展示、查询与购买流程。
+            </p>
+            <nav class="nav-grid" aria-label="主导航">
+                <a class="nav-card" href="/items">
+                    <span class="nav-title">商品列表</span>
+                    <span class="nav-desc">M3 阶段接入商品数据</span>
+                </a>
+                <a class="nav-card" href="/users">
+                    <span class="nav-title">用户列表</span>
+                    <span class="nav-desc">M3 阶段接入用户数据</span>
+                </a>
+                <a class="nav-card" href="/orders">
+                    <span class="nav-title">订单列表</span>
+                    <span class="nav-desc">M3 阶段接入订单数据</span>
+                </a>
+            </nav>
+        </section>
+    </main>
+</body>
+</html>
