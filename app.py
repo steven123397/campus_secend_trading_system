@@ -12,6 +12,8 @@ from flask import (
     url_for,
 )
 
+from services.queries import list_queries, run_query
+
 BASE_DIR = Path(__file__).resolve().parent
 DEFAULT_DATABASE_PATH = BASE_DIR / "db" / "campus_trading.sqlite3"
 DEFAULT_SCHEMA_PATH = BASE_DIR / "db" / "schema.sql"
@@ -71,6 +73,13 @@ def parse_price(raw_value):
     return float(raw_value)
 
 
+def build_query_result(group):
+    query_id = request.args.get("query", "").strip()
+    if not query_id:
+        return None
+    return run_query(get_db(), group, query_id)
+
+
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.update(
@@ -114,10 +123,14 @@ def create_app(test_config=None):
             ORDER BY item_id
             """
         )
-        users = fetch_all(
-            "SELECT user_id, user_name FROM user ORDER BY user_id"
+        users = fetch_all("SELECT user_id, user_name FROM user ORDER BY user_id")
+        return render_template(
+            "items.html",
+            items=items,
+            users=users,
+            available_queries=list_queries("items"),
+            query_result=build_query_result("items"),
         )
-        return render_template("items.html", items=items, users=users)
 
     @app.post("/items/add")
     def add_item():
@@ -200,7 +213,12 @@ def create_app(test_config=None):
             ORDER BY user_id
             """
         )
-        return render_template("users.html", users=users)
+        return render_template(
+            "users.html",
+            users=users,
+            available_queries=list_queries("users"),
+            query_result=build_query_result("users"),
+        )
 
     @app.route("/orders")
     def orders_page():
@@ -211,7 +229,12 @@ def create_app(test_config=None):
             ORDER BY order_id
             """
         )
-        return render_template("orders.html", orders=orders)
+        return render_template(
+            "orders.html",
+            orders=orders,
+            available_queries=list_queries("orders"),
+            query_result=build_query_result("orders"),
+        )
 
     return app
 

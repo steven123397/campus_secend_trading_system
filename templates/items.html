@@ -9,7 +9,7 @@
             <p class="eyebrow">Items</p>
             <h1>商品列表</h1>
         </div>
-        <p class="section-copy">数据直接来自数据库表 `item`，本页已经支持新增商品、修改价格和删除未售商品。</p>
+        <p class="section-copy">数据直接来自数据库表 `item`，本页已经支持新增商品、修改价格、删除未售商品。</p>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -52,6 +52,51 @@
             </tbody>
         </table>
     </div>
+</section>
+
+<section class="query-card">
+    <div class="section-head compact">
+        <div>
+            <p class="eyebrow">Queries</p>
+            <h2>基础查询</h2>
+        </div>
+        <p class="section-copy">点击按钮即可展示题目要求的商品查询结果。</p>
+    </div>
+
+    <div class="query-actions">
+        {% for query in available_queries %}
+        <a href="/items?query={{ query.id }}">{{ query.title }}</a>
+        {% endfor %}
+    </div>
+
+    {% if query_result %}
+    <div class="query-result">
+        <div class="result-meta">
+            <h3>{{ query_result.title }}</h3>
+            <p>{{ query_result.description }} 结果共 {{ query_result.row_count }} 条。</p>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in query_result.columns %}
+                        <th>{{ column.label }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in query_result.rows %}
+                    <tr>
+                        {% for column in query_result.columns %}
+                        <td>{{ row[column.key] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
 </section>
 
 <section class="forms-grid">

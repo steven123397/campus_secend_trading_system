@@ -9,7 +9,7 @@
             <p class="eyebrow">Orders</p>
             <h1>订单列表</h1>
         </div>
-        <p class="section-copy">此页面展示 `orders` 表中的真实订单记录，为后续连接查询和购买事务打基础。</p>
+        <p class="section-copy">此页面展示 `orders` 表中的真实订单记录，并支持连接查询结果展示。</p>
     </div>
 
     <div class="table-wrap">
@@ -34,5 +34,50 @@
             </tbody>
         </table>
     </div>
+</section>
+
+<section class="query-card">
+    <div class="section-head compact">
+        <div>
+            <p class="eyebrow">Join Queries</p>
+            <h2>连接查询</h2>
+        </div>
+        <p class="section-copy">点击按钮查看已售商品买家、订单详情，以及 u001 商品的购买情况。</p>
+    </div>
+
+    <div class="query-actions">
+        {% for query in available_queries %}
+        <a href="/orders?query={{ query.id }}">{{ query.title }}</a>
+        {% endfor %}
+    </div>
+
+    {% if query_result %}
+    <div class="query-result">
+        <div class="result-meta">
+            <h3>{{ query_result.title }}</h3>
+            <p>{{ query_result.description }} 结果共 {{ query_result.row_count }} 条。</p>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in query_result.columns %}
+                        <th>{{ column.label }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in query_result.rows %}
+                    <tr>
+                        {% for column in query_result.columns %}
+                        <td>{{ row[column.key] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
 </section>
 {% endblock %}

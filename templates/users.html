@@ -9,7 +9,7 @@
             <p class="eyebrow">Users</p>
             <h1>用户列表</h1>
         </div>
-        <p class="section-copy">此页面展示 `user` 表中的全部初始数据，后续会补充统计视图。</p>
+        <p class="section-copy">此页面展示 `user` 表中的全部初始数据，并支持查看题目要求的聚合统计结果。</p>
     </div>
 
     <div class="table-wrap">
@@ -32,5 +32,50 @@
             </tbody>
         </table>
     </div>
+</section>
+
+<section class="query-card">
+    <div class="section-head compact">
+        <div>
+            <p class="eyebrow">Aggregates</p>
+            <h2>聚合与分组</h2>
+        </div>
+        <p class="section-copy">点击按钮查看总数、分组统计、平均价格与发布商品最多的用户。</p>
+    </div>
+
+    <div class="query-actions">
+        {% for query in available_queries %}
+        <a href="/users?query={{ query.id }}">{{ query.title }}</a>
+        {% endfor %}
+    </div>
+
+    {% if query_result %}
+    <div class="query-result">
+        <div class="result-meta">
+            <h3>{{ query_result.title }}</h3>
+            <p>{{ query_result.description }} 结果共 {{ query_result.row_count }} 条。</p>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in query_result.columns %}
+                        <th>{{ column.label }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in query_result.rows %}
+                    <tr>
+                        {% for column in query_result.columns %}
+                        <td>{{ row[column.key] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
 </section>
 {% endblock %}

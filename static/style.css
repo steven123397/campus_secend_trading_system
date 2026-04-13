@@ -282,6 +282,56 @@ h1 {
     font-size: 1.08rem;
 }
 
+.query-card {
+    width: min(1100px, 100%);
+    margin: 18px auto 0;
+    padding: 28px;
+    border: 1px solid var(--panel-border);
+    border-radius: 24px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.section-head.compact {
+    margin-bottom: 18px;
+}
+
+.section-head.compact h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.query-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.query-actions a {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.query-result {
+    margin-top: 18px;
+}
+
+.result-meta h3 {
+    margin: 0;
+    font-size: 1.16rem;
+}
+
+.result-meta p {
+    margin: 10px 0 16px;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
 .data-form {
     display: grid;
     gap: 12px;
@@ -336,7 +386,8 @@ h1 {
 
     .hero-card,
     .section-card,
-    .site-header {
+    .site-header,
+    .query-card {
         padding: 24px 20px;
     }
 }
