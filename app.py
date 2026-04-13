@@ -80,6 +80,14 @@ def build_query_result(group):
     return run_query(get_db(), group, query_id)
 
 
+def generate_order_id(connection):
+    row = connection.execute(
+        "SELECT MAX(CAST(SUBSTR(order_id, 2) AS INTEGER)) AS max_id FROM orders"
+    ).fetchone()
+    next_number = (row["max_id"] or 0) + 1
+    return f"o{next_number:03d}"
+
+
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.update(
@@ -124,10 +132,14 @@ def create_app(test_config=None):
             """
         )
         users = fetch_all("SELECT user_id, user_name FROM user ORDER BY user_id")
+        unsold_items = fetch_all(
+            "SELECT item_id, item_name FROM item WHERE status = 0 ORDER BY item_id"
+        )
         return render_template(
             "items.html",
             items=items,
             users=users,
+            unsold_items=unsold_items,
             available_queries=list_queries("items"),
             query_result=build_query_result("items"),
         )
@@ -202,6 +214,50 @@ def create_app(test_config=None):
         connection.execute("DELETE FROM item WHERE item_id = ?", (item_id,))
         connection.commit()
         flash("未售商品删除成功。", "success")
+        return redirect(url_for("items_page"))
+
+    @app.post("/items/purchase")
+    def purchase_item():
+        connection = get_db()
+        item_id = request.form.get("item_id", "").strip()
+        buyer_id = request.form.get("buyer_id", "").strip()
+        order_date = request.form.get("order_date", "").strip()
+
+        try:
+            if not item_id or not buyer_id or not order_date:
+                raise ValueError("购买失败：请填写完整的购买信息。")
+
+            connection.execute("BEGIN")
+            item = connection.execute(
+                "SELECT status FROM item WHERE item_id = ?", (item_id,)
+            ).fetchone()
+
+            if item is None:
+                raise ValueError("购买失败：未找到目标商品。")
+            if item["status"] == 1:
+                raise ValueError("已售商品不能再次购买。")
+
+            order_id = generate_order_id(connection)
+            connection.execute(
+                """
+                INSERT INTO orders (order_id, item_id, buyer_id, order_date)
+                VALUES (?, ?, ?, ?)
+                """,
+                (order_id, item_id, buyer_id, order_date),
+            )
+            connection.execute(
+                "UPDATE item SET status = 1 WHERE item_id = ?",
+                (item_id,),
+            )
+            connection.commit()
+            flash(f"购买成功，订单编号 {order_id}。", "success")
+        except ValueError as error:
+            connection.rollback()
+            flash(str(error), "error")
+        except sqlite3.IntegrityError as error:
+            connection.rollback()
+            flash(f"购买失败：{error}", "error")
+
         return redirect(url_for("items_page"))
 
     @app.route("/users")

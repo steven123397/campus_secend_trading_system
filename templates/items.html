@@ -9,7 +9,7 @@
             <p class="eyebrow">Items</p>
             <h1>商品列表</h1>
         </div>
-        <p class="section-copy">数据直接来自数据库表 `item`，本页已经支持新增商品、修改价格、删除未售商品。</p>
+        <p class="section-copy">数据直接来自数据库表 `item`，本页已经支持新增商品、修改价格、删除未售商品，并可直接发起购买。</p>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -154,6 +154,33 @@
                 <input name="item_id" required>
             </label>
             <button type="submit" class="danger">删除商品</button>
+        </form>
+    </article>
+
+    <article class="form-card">
+        <h2>购买商品</h2>
+        <form method="post" action="/items/purchase" class="data-form">
+            <label>
+                商品编号
+                <select name="item_id" required>
+                    {% for item in unsold_items %}
+                    <option value="{{ item.item_id }}">{{ item.item_id }} - {{ item.item_name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                buyer_id
+                <select name="buyer_id" required>
+                    {% for user in users %}
+                    <option value="{{ user.user_id }}">{{ user.user_id }} - {{ user.user_name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                order_date
+                <input name="order_date" type="date" required>
+            </label>
+            <button type="submit">购买商品</button>
         </form>
     </article>
 </section>

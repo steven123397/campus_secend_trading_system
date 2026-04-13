@@ -4,8 +4,8 @@
 **对应计划：** `docs/mainline_plan.md`  
 **建立日期：** 2026-04-13  
 **最近更新：** 2026-04-13  
-**当前阶段：** M5 已完成  
-**总进度：** 5 / 8 任务完成
+**当前阶段：** M6 已完成  
+**总进度：** 6 / 8 任务完成
 
 ## 状态维护规则
 
@@ -24,7 +24,7 @@
 | M3 | 基础数据展示页面 | 已完成 | 首页、商品页、用户页、订单页可展示真实数据 | 已完成 4 个页面的真实数据渲染与导航联调 |
 | M4 | 数据操作功能 | 已完成 | 新增商品、修改价格、删除未售商品可用 | 已完成商品表单操作并通过真实落库验证 |
 | M5 | 基础查询、连接查询与聚合展示 | 已完成 | 所有题目要求查询可在页面展示 | 已完成基础查询、连接查询与聚合结果面板 |
-| M6 | 购买商品业务逻辑与一致性保护 | 未开始 | 购买流程事务化，重复购买被阻止 | 待执行 |
+| M6 | 购买商品业务逻辑与一致性保护 | 已完成 | 购买流程事务化，重复购买被阻止 | 已完成购买事务、订单生成与重复购买保护 |
 | M7 | 部署与在线访问地址 | 未开始 | 获得可访问公网网址并完成线上验证 | 待执行 |
 | M8 | 提交材料、说明文档与演示准备 | 未开始 | 文档、截图、简答、视频脚本齐备 | 待执行 |
 
@@ -45,6 +45,8 @@
 - 2026-04-13：完成 M4，商品页已支持新增商品、修改价格、删除未售商品，并通过数据库断言验证真实落库；验证命令 `.venv/bin/python -m unittest tests/test_item_operations.py tests/test_pages.py tests/test_app.py tests/test_database.py` 全部通过。
 - 2026-04-13：开始执行 M5，进入基础查询、连接查询与聚合展示阶段。
 - 2026-04-13：完成 M5，已新增 `services/queries.py` 并在商品、用户、订单页面接入题目要求的全部查询结果面板；验证命令 `.venv/bin/python -m unittest tests/test_queries.py tests/test_item_operations.py tests/test_pages.py tests/test_app.py tests/test_database.py` 全部通过。
+- 2026-04-13：开始执行 M6，进入购买商品业务逻辑与一致性保护阶段。
+- 2026-04-13：完成 M6，商品页已支持购买商品事务、自动生成订单编号、重复购买拦截与失败回滚；验证命令 `.venv/bin/python -m unittest tests/test_purchase.py tests/test_queries.py tests/test_item_operations.py tests/test_pages.py tests/test_app.py tests/test_database.py` 全部通过。
 
 ## 使用提醒
 
