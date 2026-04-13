@@ -44,6 +44,10 @@ def get_db():
     return g.db
 
 
+def fetch_all(query, params=()):
+    return get_db().execute(query, params).fetchall()
+
+
 def close_db(_error=None):
     connection = g.pop("db", None)
     if connection is not None:
@@ -74,19 +78,48 @@ def create_app(test_config=None):
 
     @app.route("/")
     def home():
-        return render_template("index.html")
+        item_count = fetch_all("SELECT COUNT(*) AS count FROM item")[0]["count"]
+        user_count = fetch_all("SELECT COUNT(*) AS count FROM user")[0]["count"]
+        order_count = fetch_all("SELECT COUNT(*) AS count FROM orders")[0]["count"]
+        return render_template(
+            "index.html",
+            item_count=item_count,
+            user_count=user_count,
+            order_count=order_count,
+        )
 
     @app.route("/items")
-    def items_placeholder():
-        return "<h1>商品列表页开发中</h1><p>将在 M3 阶段接入真实数据库数据。</p>"
+    def items_page():
+        items = fetch_all(
+            """
+            SELECT item_id, item_name, category, price, status, seller_id
+            FROM item
+            ORDER BY item_id
+            """
+        )
+        return render_template("items.html", items=items)
 
     @app.route("/users")
-    def users_placeholder():
-        return "<h1>用户列表页开发中</h1><p>将在 M3 阶段接入真实数据库数据。</p>"
+    def users_page():
+        users = fetch_all(
+            """
+            SELECT user_id, user_name, phone
+            FROM user
+            ORDER BY user_id
+            """
+        )
+        return render_template("users.html", users=users)
 
     @app.route("/orders")
-    def orders_placeholder():
-        return "<h1>订单列表页开发中</h1><p>将在 M3 阶段接入真实数据库数据。</p>"
+    def orders_page():
+        orders = fetch_all(
+            """
+            SELECT order_id, item_id, buyer_id, order_date
+            FROM orders
+            ORDER BY order_id
+            """
+        )
+        return render_template("orders.html", orders=orders)
 
     return app
 

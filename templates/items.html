@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}商品列表 - 校园二手交易平台数据库系统{% endblock %}
+
+{% block content %}
+<section class="section-card">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Items</p>
+            <h1>商品列表</h1>
+        </div>
+        <p class="section-copy">数据直接来自数据库表 `item`，用于支撑后续增删改查与购买流程。</p>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>商品编号</th>
+                    <th>商品名称</th>
+                    <th>类别</th>
+                    <th>价格</th>
+                    <th>状态</th>
+                    <th>卖家编号</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.item_id }}</td>
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ "%.2f"|format(item.price) }}</td>
+                    <td>
+                        <span class="status-pill {{ 'sold' if item.status == 1 else 'available' }}">
+                            {{ '已售出' if item.status == 1 else '未售出' }}
+                        </span>
+                    </td>
+                    <td>{{ item.seller_id }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

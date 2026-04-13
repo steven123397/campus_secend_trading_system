@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}用户列表 - 校园二手交易平台数据库系统{% endblock %}
+
+{% block content %}
+<section class="section-card">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Users</p>
+            <h1>用户列表</h1>
+        </div>
+        <p class="section-copy">此页面展示 `user` 表中的全部初始数据，后续会补充统计视图。</p>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户编号</th>
+                    <th>用户名</th>
+                    <th>手机号</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.user_id }}</td>
+                    <td>{{ user.user_name }}</td>
+                    <td>{{ user.phone }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
