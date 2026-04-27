@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
-{% block title %}用户列表 - 校园二手交易平台数据库系统{% endblock %}
+{% block title %}校园用户 - CampusLoop 校园二手交易平台{% endblock %}
 
 {% block content %}
-<section class="section-card">
+<section class="section-card page-hero">
     <div class="section-head">
         <div>
-            <p class="eyebrow">Users</p>
-            <h1>用户列表</h1>
+            <p class="eyebrow">Community</p>
+            <h1>校园用户中心</h1>
         </div>
-        <p class="section-copy">此页面展示 `user` 表中的全部初始数据，并支持查看题目要求的聚合统计结果。</p>
+        <p class="section-copy">用户表是交易身份的基础，当前展示用户编号、昵称和联系方式，后续可继续扩展为真实登录账号。</p>
     </div>
 
     <div class="table-wrap">
@@ -25,7 +25,7 @@
                 {% for user in users %}
                 <tr>
                     <td>{{ user.user_id }}</td>
-                    <td>{{ user.user_name }}</td>
+                    <td><strong>{{ user.user_name }}</strong></td>
                     <td>{{ user.phone }}</td>
                 </tr>
                 {% endfor %}
@@ -37,10 +37,10 @@
 <section class="query-card">
     <div class="section-head compact">
         <div>
-            <p class="eyebrow">Aggregates</p>
-            <h2>聚合与分组</h2>
+            <p class="eyebrow">Insights</p>
+            <h2>社群数据洞察</h2>
         </div>
-        <p class="section-copy">点击按钮查看总数、分组统计、平均价格与发布商品最多的用户。</p>
+        <p class="section-copy">查看商品总量、分类统计、平均价格和最活跃卖家，辅助平台运营。</p>
     </div>
 
     <div class="query-actions">

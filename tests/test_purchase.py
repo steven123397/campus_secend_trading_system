@@ -17,6 +17,10 @@ class PurchaseFlowTestCase(unittest.TestCase):
         )
         initialize_database(self.app.config["DATABASE_PATH"], force=True)
         self.client = self.app.test_client()
+        self.client.post(
+            "/login",
+            data={"mode": "login", "identifier": "u001", "password": "campus123"},
+        )
 
     def tearDown(self):
         self.temp_dir.cleanup()

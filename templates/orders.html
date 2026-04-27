@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
-{% block title %}订单列表 - 校园二手交易平台数据库系统{% endblock %}
+{% block title %}交易订单 - CampusLoop 校园二手交易平台{% endblock %}
 
 {% block content %}
-<section class="section-card">
+<section class="section-card page-hero">
     <div class="section-head">
         <div>
             <p class="eyebrow">Orders</p>
-            <h1>订单列表</h1>
+            <h1>交易订单中心</h1>
         </div>
-        <p class="section-copy">此页面展示 `orders` 表中的真实订单记录，并支持连接查询结果展示。</p>
+        <p class="section-copy">订单数据记录每一次成交商品、买家和日期，配合商品状态形成完整的校园二手交易闭环。</p>
     </div>
 
     <div class="table-wrap">
@@ -25,7 +25,7 @@
             <tbody>
                 {% for order in orders %}
                 <tr>
-                    <td>{{ order.order_id }}</td>
+                    <td><strong>{{ order.order_id }}</strong></td>
                     <td>{{ order.item_id }}</td>
                     <td>{{ order.buyer_id }}</td>
                     <td>{{ order.order_date }}</td>
@@ -39,10 +39,10 @@
 <section class="query-card">
     <div class="section-head compact">
         <div>
-            <p class="eyebrow">Join Queries</p>
-            <h2>连接查询</h2>
+            <p class="eyebrow">Order Intelligence</p>
+            <h2>交易链路查询</h2>
         </div>
-        <p class="section-copy">点击按钮查看已售商品买家、订单详情，以及 u001 商品的购买情况。</p>
+        <p class="section-copy">通过连接查询查看已售商品买家、订单详情和指定卖家的购买状态。</p>
     </div>
 
     <div class="query-actions">

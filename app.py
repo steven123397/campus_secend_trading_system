@@ -1,5 +1,6 @@
 import os
 import sqlite3
+from functools import wraps
 from pathlib import Path
 
 from flask import (
@@ -10,8 +11,10 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from services.queries import list_queries, run_query
 
@@ -19,6 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DEFAULT_DATABASE_PATH = BASE_DIR / "db" / "campus_trading.sqlite3"
 DEFAULT_SCHEMA_PATH = BASE_DIR / "db" / "schema.sql"
 DEFAULT_SEED_PATH = BASE_DIR / "db" / "seed.sql"
+DEFAULT_USER_PASSWORD = "campus123"
 
 
 def create_connection(database_path):
@@ -45,6 +49,43 @@ def initialize_database(database_path, force=False, schema_path=None, seed_path=
     try:
         connection.executescript(schema_file.read_text(encoding="utf-8"))
         connection.executescript(seed_file.read_text(encoding="utf-8"))
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def migrate_database(database_path):
+    database_file = Path(database_path)
+    if not database_file.exists():
+        return
+
+    connection = create_connection(str(database_file))
+    try:
+        columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(user)").fetchall()
+        }
+        if "password_hash" not in columns:
+            connection.execute("ALTER TABLE user ADD COLUMN password_hash TEXT")
+
+        missing_password_users = connection.execute(
+            """
+            SELECT user_id
+            FROM user
+            WHERE password_hash IS NULL OR password_hash = ''
+            """
+        ).fetchall()
+
+        if missing_password_users:
+            default_password_hash = generate_password_hash(DEFAULT_USER_PASSWORD)
+            connection.executemany(
+                "UPDATE user SET password_hash = ? WHERE user_id = ?",
+                [
+                    (default_password_hash, user["user_id"])
+                    for user in missing_password_users
+                ],
+            )
+
         connection.commit()
     finally:
         connection.close()
@@ -89,6 +130,34 @@ def generate_order_id(connection):
     return f"o{next_number:03d}"
 
 
+def generate_user_id(connection):
+    row = connection.execute(
+        "SELECT MAX(CAST(SUBSTR(user_id, 2) AS INTEGER)) AS max_id FROM user"
+    ).fetchone()
+    next_number = (row["max_id"] or 0) + 1
+    return f"u{next_number:03d}"
+
+
+def login_required(view):
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if g.get("current_user") is None:
+            flash("请先登录后再进行交易操作。", "error")
+            return redirect(url_for("login_page", next=url_for("items_page")))
+
+        return view(*args, **kwargs)
+
+    return wrapped_view
+
+
+def get_safe_next_url(default_endpoint):
+    next_url = request.args.get("next", "")
+    if next_url.startswith("/") and not next_url.startswith("//"):
+        return next_url
+
+    return url_for(default_endpoint)
+
+
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.update(
@@ -108,8 +177,31 @@ def create_app(test_config=None):
             schema_path=app.config["SCHEMA_PATH"],
             seed_path=app.config["SEED_PATH"],
         )
+        migrate_database(app.config["DATABASE_PATH"])
 
     app.teardown_appcontext(close_db)
+
+    @app.before_request
+    def load_logged_in_user():
+        g.current_user = None
+        user_id = session.get("user_id")
+
+        if user_id is None or request.endpoint == "static":
+            return
+
+        user = get_db().execute(
+            """
+            SELECT user_id, user_name, phone
+            FROM user
+            WHERE user_id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+
+        if user is None:
+            session.clear()
+        else:
+            g.current_user = user
 
     @app.route("/")
     def home():
@@ -122,6 +214,75 @@ def create_app(test_config=None):
             user_count=user_count,
             order_count=order_count,
         )
+
+    @app.route("/login", methods=("GET", "POST"))
+    def login_page():
+        if request.method == "POST":
+            mode = request.form.get("mode", "login")
+
+            if mode == "signup":
+                return register_user()
+
+            identifier = request.form.get("identifier", "").strip()
+            password = request.form.get("password", "")
+            user = fetch_one(
+                """
+                SELECT user_id, user_name, phone, password_hash
+                FROM user
+                WHERE user_id = ? OR phone = ?
+                """,
+                (identifier, identifier),
+            )
+
+            if user is None or not check_password_hash(user["password_hash"], password):
+                flash("登录失败：账号或密码不正确。", "error")
+                return redirect(url_for("login_page"))
+
+            session.clear()
+            session["user_id"] = user["user_id"]
+            flash(f"欢迎回来，{user['user_name']}。", "success")
+            return redirect(get_safe_next_url("items_page"))
+
+        return render_template("login.html")
+
+    def register_user():
+        connection = get_db()
+        user_name = request.form.get("user_name", "").strip()
+        phone = request.form.get("phone", "").strip()
+        password = request.form.get("new_password", "")
+
+        if not user_name or not phone or not password:
+            flash("注册失败：请填写昵称、手机号和密码。", "error")
+            return redirect(url_for("login_page"))
+
+        if len(password) < 6:
+            flash("注册失败：密码至少需要 6 位。", "error")
+            return redirect(url_for("login_page"))
+
+        try:
+            user_id = generate_user_id(connection)
+            connection.execute(
+                """
+                INSERT INTO user (user_id, user_name, phone, password_hash)
+                VALUES (?, ?, ?, ?)
+                """,
+                (user_id, user_name, phone, generate_password_hash(password)),
+            )
+            connection.commit()
+            session.clear()
+            session["user_id"] = user_id
+            flash(f"注册成功，用户编号 {user_id}。", "success")
+            return redirect(url_for("items_page"))
+        except sqlite3.IntegrityError as error:
+            connection.rollback()
+            flash(f"注册失败：{error}", "error")
+            return redirect(url_for("login_page"))
+
+    @app.post("/logout")
+    def logout():
+        session.clear()
+        flash("你已退出登录。", "success")
+        return redirect(url_for("home"))
 
     @app.route("/items")
     def items_page():
@@ -146,6 +307,7 @@ def create_app(test_config=None):
         )
 
     @app.post("/items/add")
+    @login_required
     def add_item():
         connection = get_db()
 
@@ -175,6 +337,7 @@ def create_app(test_config=None):
         return redirect(url_for("items_page"))
 
     @app.post("/items/update-price")
+    @login_required
     def update_item_price():
         connection = get_db()
 
@@ -199,6 +362,7 @@ def create_app(test_config=None):
         return redirect(url_for("items_page"))
 
     @app.post("/items/delete")
+    @login_required
     def delete_item():
         connection = get_db()
         item_id = request.form.get("item_id", "").strip()
@@ -218,6 +382,7 @@ def create_app(test_config=None):
         return redirect(url_for("items_page"))
 
     @app.post("/items/purchase")
+    @login_required
     def purchase_item():
         connection = get_db()
         item_id = request.form.get("item_id", "").strip()

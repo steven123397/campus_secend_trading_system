@@ -5,17 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}校园二手交易平台数据库系统{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
 <body>
+    <div class="page-atmosphere" aria-hidden="true">
+        <span class="orb orb-one"></span>
+        <span class="orb orb-two"></span>
+        <span class="grid-glow"></span>
+    </div>
+
     <div class="site-shell">
         <header class="site-header">
-            <a class="brand" href="/">校园二手交易平台数据库系统</a>
+            <a class="brand" href="/" aria-label="校园二手交易平台数据库系统">
+                <span class="brand-mark">CL</span>
+                <span class="brand-copy">
+                    <strong>CampusLoop</strong>
+                    <small>校园二手交易平台数据库系统</small>
+                </span>
+            </a>
+
             <nav class="site-nav" aria-label="全站导航">
                 <a href="/" {% if request.path == '/' %}class="is-active"{% endif %}>首页</a>
-                <a href="/items" {% if request.path == '/items' %}class="is-active"{% endif %}>商品列表</a>
-                <a href="/users" {% if request.path == '/users' %}class="is-active"{% endif %}>用户列表</a>
-                <a href="/orders" {% if request.path == '/orders' %}class="is-active"{% endif %}>订单列表</a>
+                <a href="/items" {% if request.path == '/items' %}class="is-active"{% endif %}>逛闲置</a>
+                <a href="/users" {% if request.path == '/users' %}class="is-active"{% endif %}>校园用户</a>
+                <a href="/orders" {% if request.path == '/orders' %}class="is-active"{% endif %}>交易订单</a>
             </nav>
+
+            {% if g.current_user %}
+            <div class="user-menu">
+                <a class="header-user" href="/items">
+                    <span>{{ g.current_user.user_name }}</span>
+                    <small>{{ g.current_user.user_id }}</small>
+                </a>
+                <form method="post" action="/logout">
+                    <button type="submit">退出</button>
+                </form>
+            </div>
+            {% else %}
+            <a class="header-action {% if request.path == '/login' %}is-active{% endif %}" href="/login">登录 / 发布</a>
+            {% endif %}
         </header>
 
         <main class="content-shell">

@@ -1,43 +1,104 @@
 {% extends "layout.html" %}
 
-{% block title %}首页 - 校园二手交易平台数据库系统{% endblock %}
+{% block title %}CampusLoop - 校园二手交易平台数据库系统{% endblock %}
 
 {% block content %}
-<section class="hero-card">
-    <p class="eyebrow">Campus Second-Hand Trading</p>
-    <h1>数据库课程作业主站</h1>
-    <p class="hero-copy">
-        当前系统已经接入真实 SQLite 数据库，可查看商品、用户、订单三类核心数据，后续将继续补齐增删改查与购买事务逻辑。
-    </p>
+<section class="hero-card home-hero">
+    <div class="hero-content">
+        <p class="eyebrow">Campus Marketplace</p>
+        <h1 class="hero-title">
+            <span>让校园闲置</span>
+            <span>像新品一样被认真看见。</span>
+        </h1>
+        <p class="hero-copy">
+            CampusLoop 面向学生社群打造可信二手交易体验，把教材、数码、宿舍好物和订单数据集中在一个更清晰、更商业化的平台界面中。
+        </p>
+        <div class="hero-actions">
+            <a class="button primary" href="/items">立即逛闲置</a>
+            <a class="button ghost" href="/login">登录发布商品</a>
+        </div>
+        <div class="trust-row" aria-label="平台能力">
+            <span>同校交易</span>
+            <span>库存实时</span>
+            <span>订单可追踪</span>
+        </div>
+    </div>
+
+    <div class="hero-showcase" aria-label="平台预览">
+        <div class="showcase-toolbar">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="deal-card featured">
+            <span class="deal-tag">Hot Deal</span>
+            <strong>Microcontroller</strong>
+            <p>电子实验课同款开发板，卖家 u001 正在出售。</p>
+            <div class="deal-meta">
+                <span>Electronics</span>
+                <b>¥80.00</b>
+            </div>
+        </div>
+        <div class="deal-row">
+            <span class="category-chip">Book</span>
+            <div>
+                <strong>CalculusBook</strong>
+                <small>低价教材，适合高数复习</small>
+            </div>
+            <b>¥20</b>
+        </div>
+        <div class="deal-row muted">
+            <span class="category-chip warm">Daily</span>
+            <div>
+                <strong>WaterBottle</strong>
+                <small>宿舍日用品专区</small>
+            </div>
+            <b>¥15</b>
+        </div>
+    </div>
 </section>
 
 <section class="metrics-grid">
     <article class="metric-card">
-        <span class="metric-label">商品总数</span>
+        <span class="metric-label">在售与历史商品</span>
         <strong class="metric-value">{{ item_count }}</strong>
+        <small>覆盖教材、数码、家具、日用品</small>
     </article>
-    <article class="metric-card">
-        <span class="metric-label">用户总数</span>
+    <article class="metric-card accent">
+        <span class="metric-label">校园用户</span>
         <strong class="metric-value">{{ user_count }}</strong>
+        <small>真实用户表驱动，方便后续接入账号体系</small>
     </article>
     <article class="metric-card">
-        <span class="metric-label">订单总数</span>
+        <span class="metric-label">已生成订单</span>
         <strong class="metric-value">{{ order_count }}</strong>
+        <small>购买记录可追踪，库存状态同步变化</small>
     </article>
+</section>
+
+<section class="section-card commerce-strip">
+    <div>
+        <p class="eyebrow">What You Can Do</p>
+        <h2>从浏览到下单，围绕校园交易闭环重新组织。</h2>
+    </div>
+    <a class="button compact" href="/login">登录后发布商品</a>
 </section>
 
 <section class="nav-grid">
     <a class="nav-card" href="/items">
-        <span class="nav-title">商品列表</span>
-        <span class="nav-desc">查看商品编号、分类、价格、状态与卖家信息。</span>
+        <span class="nav-icon">01</span>
+        <span class="nav-title">逛闲置商品</span>
+        <span class="nav-desc">查看价格、分类、售卖状态，并直接完成新增、改价、购买等操作。</span>
     </a>
     <a class="nav-card" href="/users">
-        <span class="nav-title">用户列表</span>
-        <span class="nav-desc">查看平台注册用户及联系方式。</span>
+        <span class="nav-icon">02</span>
+        <span class="nav-title">管理校园用户</span>
+        <span class="nav-desc">查看用户编号、姓名和联系方式，为后续账号登录能力预留入口。</span>
     </a>
     <a class="nav-card" href="/orders">
-        <span class="nav-title">订单列表</span>
-        <span class="nav-desc">查看订单编号、买家与下单日期。</span>
+        <span class="nav-icon">03</span>
+        <span class="nav-title">追踪交易订单</span>
+        <span class="nav-desc">查看买家、商品、日期等订单链路，支持连接查询展示完整交易视图。</span>
     </a>
 </section>
 {% endblock %}

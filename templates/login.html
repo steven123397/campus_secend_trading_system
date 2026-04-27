@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+
+{% block title %}登录 - CampusLoop 校园二手交易平台{% endblock %}
+
+{% block content %}
+<section class="auth-stage" data-auth-root>
+    <div class="auth-visual">
+        <p class="eyebrow">Secure Entry</p>
+        <h1>进入你的校园交易工作台。</h1>
+        <p class="hero-copy">
+            使用用户编号或手机号登录后，可以发布商品、修改价格、删除未售商品和发起购买。
+        </p>
+
+        <div class="auth-orbit" aria-hidden="true">
+            <span class="orbit-ring"></span>
+            <span class="orbit-dot dot-one"></span>
+            <span class="orbit-dot dot-two"></span>
+            <div class="phone-preview">
+                <div class="phone-notch"></div>
+                <div class="phone-card live">
+                    <small>今日新上架</small>
+                    <strong>12</strong>
+                </div>
+                <div class="phone-card">
+                    <small>交易安心指数</small>
+                    <strong>98%</strong>
+                </div>
+                <div class="phone-wave"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-card" data-tilt-card>
+        {% set login_action = url_for('login_page', next=request.args.get('next')) if request.args.get('next') else url_for('login_page') %}
+
+        {% if g.current_user %}
+        <div class="auth-state">
+            <div>
+                <span>当前已登录</span>
+                <strong>{{ g.current_user.user_name }} · {{ g.current_user.user_id }}</strong>
+            </div>
+            <form method="post" action="/logout">
+                <button type="submit">退出登录</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="auth-tabs" role="tablist" aria-label="登录模式">
+            <button type="button" class="is-active" data-auth-switch="login">账号登录</button>
+            <button type="button" data-auth-switch="signup">快速注册</button>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="message-stack auth-messages">
+                {% for category, message in messages %}
+                <div class="message-banner {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ login_action }}" class="auth-form is-active" data-auth-panel="login">
+            <input type="hidden" name="mode" value="login">
+            <label>
+                手机号或用户编号
+                <input name="identifier" placeholder="例如 u001 / 13800000001" autocomplete="username" required>
+            </label>
+            <label>
+                登录密码
+                <input name="password" type="password" placeholder="输入密码" autocomplete="current-password" data-password-meter required>
+            </label>
+            <div class="auth-options">
+                <label class="check-line">
+                    <input type="checkbox" name="remember">
+                    记住我
+                </label>
+                <a href="/users">查看用户表</a>
+            </div>
+            <button type="submit" class="button primary full">进入平台</button>
+        </form>
+
+        <form method="post" action="{{ login_action }}" class="auth-form" data-auth-panel="signup">
+            <input type="hidden" name="mode" value="signup">
+            <label>
+                校园昵称
+                <input name="user_name" placeholder="给自己起个交易昵称" autocomplete="name" required>
+            </label>
+            <label>
+                手机号
+                <input name="phone" placeholder="用于交易联系" autocomplete="tel" required>
+            </label>
+            <label>
+                设置密码
+                <input name="new_password" type="password" placeholder="至少 6 位" autocomplete="new-password" data-password-meter required>
+            </label>
+            <div class="strength-meter" aria-hidden="true">
+                <span></span>
+            </div>
+            <button type="submit" class="button primary full">创建校园账号</button>
+        </form>
+
+        <div class="auth-footnote">
+            <span class="pulse-dot"></span>
+            已有种子用户可用用户编号或手机号登录，默认密码为 campus123。
+        </div>
+    </div>
+</section>
+{% endblock %}

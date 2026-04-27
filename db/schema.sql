@@ -8,7 +8,8 @@ DROP TABLE IF EXISTS user;
 CREATE TABLE user (
     user_id TEXT PRIMARY KEY,
     user_name TEXT NOT NULL,
-    phone TEXT NOT NULL UNIQUE
+    phone TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL
 );
 
 CREATE TABLE item (
